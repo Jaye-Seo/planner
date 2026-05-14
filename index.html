@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 데이트 코스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f9f8f6;
+    --surface: #ffffff;
+    --surface2: #f2f1ef;
+    --border: rgba(0,0,0,0.08);
+    --accent: #b07d4f;
+    --accent2: #4a7fa8;
+    --text: #1a1a1a;
+    --muted: rgba(26,26,26,0.45);
+    --pill-bg: rgba(176,125,79,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* 상단 헤더 */
+  .header {
+    padding: 48px 28px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+  .header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+  }
+  .header p {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* 섹션 */
+  .section {
+    padding: 28px 28px 0;
+  }
+  .section-title {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+
+  /* 카드 */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 20px;
+    margin-bottom: 12px;
+  }
+  .card-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .card-label strong {
+    color: var(--text);
+    font-weight: 500;
+    display: block;
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+
+  /* MBTI 입력 */
+  .mbti-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .mbti-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .mbti-input:focus { border-color: var(--accent); }
+  .mbti-input::placeholder { opacity: 0.3; letter-spacing: 2px; font-size: 13px; }
+  .mbti-divider {
+    color: var(--muted);
+    font-size: 18px;
+    font-weight: 300;
+    flex-shrink: 0;
+  }
+
+  /* 나잇대 칩 */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .chip.active {
+    background: var(--pill-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* 슬라이더 공통 */
+  .slider-wrap {
+    position: relative;
+    padding: 4px 0 24px;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .slider-label-l, .slider-label-r {
+    font-size: 11px;
+    color: var(--muted);
+    max-width: 45%;
+    line-height: 1.4;
+  }
+  .slider-label-r { text-align: right; }
+  .slider-value {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid var(--accent);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  input[type=range]:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+
+  /* 인파 선호 — 두 사람 각각 */
+  .dual-slider { margin-bottom: 4px; }
+  .dual-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .dual-label-name {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .dual-label-val {
+    font-size: 11px;
+    color: var(--accent);
+  }
+  input[type=range].accent2::-webkit-slider-thumb {
+    border-color: var(--accent2);
+  }
+  .val-accent2 { color: var(--accent2) !important; }
+
+  /* 식사 타이밍 토글 */
+  .toggle-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .toggle-btn {
+    flex: 1;
+    padding: 12px 10px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+    line-height: 1.4;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .toggle-btn:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+  .toggle-btn.active {
+    background: var(--pill-bg);
+    color: var(--accent);
+  }
+  .toggle-btn span {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 3px;
+  }
+
+  /* 체크 태그 */
+  .tag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tag.active {
+    background: rgba(168,196,224,0.1);
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  /* 텍스트 힌트 */
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.6;
+    opacity: 0.7;
+  }
+
+  /* CTA 버튼 */
+  .cta-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    padding: 16px 28px 28px;
+    background: linear-gradient(transparent, var(--bg) 40%);
+  }
+  .cta-btn {
+    width: 100%;
+    padding: 17px;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cta-btn:active { opacity: 0.85; transform: scale(0.99); }
+
+  /* 진행 바 */
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    margin: 0 28px 0;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* 결과 카드 (숨김) */
+  #result-section {
+    display: none;
+    padding: 28px 28px 0;
+  }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid rgba(232,196,160,0.2);
+    border-radius: 16px;
+    padding: 22px 20px;
+  }
+  .result-card h3 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+  .loading-dots {
+    display: flex;
+    gap: 6px;
+    padding: 8px 0;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: blink 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0%,80%,100% { opacity: 0.2; transform: scale(0.9); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+  #result-text {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  /* MBTI 드롭다운 */
+  .mbti-select {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    letter-spacing: 2px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b07d4f' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    transition: border-color 0.2s;
+  }
+  .mbti-select:focus { border-color: var(--accent); }
+
+  /* 구분선 */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0 0;
+  }
+
+  /* 설정 패널 */
+  #settings-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    align-items: flex-end;
+  }
+  #settings-panel.open { display: flex; }
+  .settings-sheet {
+    background: var(--surface);
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 28px 24px 40px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .settings-header h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 0 4px;
+    line-height: 1;
+  }
+  .key-row {
+    margin-bottom: 18px;
+  }
+  .key-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .key-label span {
+    font-size: 10px;
+    color: var(--accent);
+    margin-left: 6px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .key-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .key-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+  .key-input:focus { border-color: var(--accent); }
+  .key-save-btn {
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .key-status {
+    font-size: 11px;
+    margin-top: 6px;
+    height: 14px;
+  }
+  .key-status.ok { color: #4caf7d; }
+  .key-status.empty { color: var(--muted); }
+  .key-link {
+    font-size: 11px;
+    color: var(--accent2);
+    text-decoration: none;
+    margin-top: 5px;
+    display: inline-block;
+  }
+
+  /* 설정 버튼 (헤더 우측) */
+  .settings-trigger {
+    position: absolute;
+    top: 48px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .settings-trigger.has-keys { color: var(--accent); border-color: var(--accent); }
+
+  /* 장소 목록 */
+  #map-section {
+    display: none;
+    padding: 24px 0 0;
+  }
+
+  /* 플랜 탭 */
+  .plan-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .plan-tab {
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .plan-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* 장소 카드 */
+  .place-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .place-photo {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: var(--surface2);
+    display: block;
+  }
+  .place-photo-placeholder {
+    width: 100%;
+    height: 120px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .place-body {
+    padding: 14px 16px;
+  }
+  .place-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .place-time-badge {
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(176,125,79,0.1);
+    padding: 3px 8px;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .place-name { font-weight: 500; color: var(--text); font-size: 14px; }
+  .place-reason { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .place-kakao-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    background: #FEE500;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #3a1d1d;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* 트렌드 출처 */
+  .trend-source {
+    display: inline-block;
+    background: rgba(74,127,168,0.08);
+    border: 1px solid rgba(74,127,168,0.2);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 10px;
+    color: var(--accent2);
+    margin: 2px 3px 2px 0;
+  }
+
+  /* 예산 요약 */
+  .budget-summary {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 4px;
+  }
+  .budget-summary strong { color: var(--text); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header" style="position:relative">
+  <div class="header-label">Seoul Date Planner</div>
+  <h1>오늘 어떤 데이트<br>할까요? 🌙</h1>
+  <p>두 사람 정보를 입력하면 서울 맞춤 코스를 추천해 드려요</p>
+  <button class="settings-trigger" id="settingsBtn" onclick="openSettings()">⚙ API 키</button>
+</div>
+
+<div class="progress-bar" style="margin-top:16px">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- MBTI -->
+<div class="section" style="margin-top:24px">
+  <div class="section-title">프로필</div>
+  <div class="card">
+    <div class="card-label">
+      <strong>MBTI 조합</strong>
+      두 분의 MBTI를 선택해 주세요
+    </div>
+    <div class="mbti-row">
+      <select class="mbti-select" id="mbti1" onchange="updateProgress()">
+        <option value="">선택</option>
+        <option value="INTJ">INTJ</option>
+        <option value="INTP">INTP</option>
+        <option value="ENTJ">ENTJ</option>
+        <option value="ENTP">ENTP</option>
+        <option value="INFJ">INFJ</option>
+        <option value="INFP">INFP</option>
+        <option value="ENFJ">ENFJ</option>
+        <option value="ENFP">ENFP</option>
+        <option value="ISTJ">ISTJ</option>
+        <option value="ISFJ">ISFJ</option>
+        <option value="ESTJ">ESTJ</option>
+        <option value="ESFJ">ESFJ</option>
+        <option value="ISTP" selected>ISTP</option>
+        <option value="ISFP">ISFP</option>
+        <option value="ESTP">ESTP</option>
+        <option value="ESFP">ESFP</option>
+      </select>
+      <div class="mbti-divider">+</div>
+      <select class="mbti-select" id="mbti2" onchange="updateProgress()">
+        <option value="">선택</option>
+        <option value="INTJ">INTJ</option>
+        <option value="INTP" selected>INTP</option>
+        <option value="ENTJ">ENTJ</option>
+        <option value="ENTP">ENTP</option>
+        <option value="INFJ">INFJ</option>
+        <option value="INFP">INFP</option>
+        <option value="ENFJ">ENFJ</option>
+        <option value="ENFP">ENFP</option>
+        <option value="ISTJ">ISTJ</option>
+        <option value="ISFJ">ISFJ</option>
+        <option value="ESTJ">ESTJ</option>
+        <option value="ESFJ">ESFJ</option>
+        <option value="ISTP">ISTP</option>
+        <option value="ISFP">ISFP</option>
+        <option value="ESTP">ESTP</option>
+        <option value="ESFP">ESFP</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 연령대 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>연령대</strong>
+      두 분의 연령대를 선택해 주세요
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="dual-label" style="margin-bottom:8px">
+        <span class="dual-label-name">첫 번째 분</span>
+      </div>
+      <div class="chips" id="age1chips">
+        <button class="chip" onclick="selectChip('age1chips',this,'20대 초반')">20대 초반</button>
+        <button class="chip" onclick="selectChip('age1chips',this,'20대 중반')">20대 중반</button>
+        <button class="chip" onclick="selectChip('age1chips',this,'20대 후반')">20대 후반</button>
+        <button class="chip" onclick="selectChip('age1chips',this,'30대 초반')">30대 초반</button>
+        <button class="chip" onclick="selectChip('age1chips',this,'30대 중반')">30대 중반</button>
+        <button class="chip" onclick="selectChip('age1chips',this,'30대 후반')">30대 후반</button>
+      </div>
+    </div>
+    <div>
+      <div class="dual-label" style="margin-bottom:8px">
+        <span class="dual-label-name">두 번째 분</span>
+      </div>
+      <div class="chips" id="age2chips">
+        <button class="chip" onclick="selectChip('age2chips',this,'20대 초반')">20대 초반</button>
+        <button class="chip" onclick="selectChip('age2chips',this,'20대 중반')">20대 중반</button>
+        <button class="chip" onclick="selectChip('age2chips',this,'20대 후반')">20대 후반</button>
+        <button class="chip" onclick="selectChip('age2chips',this,'30대 초반')">30대 초반</button>
+        <button class="chip" onclick="selectChip('age2chips',this,'30대 중반')">30대 중반</button>
+        <button class="chip" onclick="selectChip('age2chips',this,'30대 후반')">30대 후반</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 오늘의 컨디션 -->
+<div class="section">
+  <div class="section-title">오늘의 컨디션</div>
+
+  <!-- 에너지 레벨 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>피로도 / 에너지 레벨</strong>
+      얼마나 활동적으로 움직이고 싶어요?
+    </div>
+    <div class="slider-wrap">
+      <div class="slider-labels">
+        <span class="slider-label-l">☕ 카페 한 곳에서<br>느긋하게</span>
+        <span class="slider-label-r">번화가 투어<br>풀 액티브 🏃</span>
+      </div>
+      <input type="range" id="energySlider" min="0" max="100" value="50" oninput="updateSliderLabel('energyLabel',this.value,energyLabels);updateProgress()">
+      <div class="slider-value" id="energyLabel">적당히 활동적으로</div>
+    </div>
+  </div>
+
+  <!-- 실내/실외 — 두 사람 각각 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>실내 / 실외 선호도</strong>
+      각자 따로 설정해 주세요
+    </div>
+    <div class="dual-slider">
+      <div class="dual-label">
+        <span class="dual-label-name">첫 번째 분</span>
+        <span class="dual-label-val" id="indoor1Val">50% 실외</span>
+      </div>
+      <input type="range" min="0" max="100" value="50"
+        oninput="updateIndoor(1,this.value);updateProgress()">
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:16px;padding:0 2px">
+      <span>🏠 완전 실내</span><span>🌿 완전 실외</span>
+    </div>
+
+    <div class="dual-slider">
+      <div class="dual-label">
+        <span class="dual-label-name">두 번째 분</span>
+        <span class="dual-label-val val-accent2" id="indoor2Val">50% 실외</span>
+      </div>
+      <input type="range" class="accent2" min="0" max="100" value="50"
+        oninput="updateIndoor(2,this.value);updateProgress()">
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:0;padding:0 2px">
+      <span>🏠 완전 실내</span><span>🌿 완전 실외</span>
+    </div>
+    <p class="hint" id="indoorHint"></p>
+  </div>
+
+  <!-- 인파 선호도 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>인파 선호도</strong>
+      핫하고 사람 많은 곳 vs 조용한 곳
+    </div>
+    <div class="slider-wrap">
+      <div class="slider-labels">
+        <span class="slider-label-l">🌿 한적하고<br>조용한 곳</span>
+        <span class="slider-label-r">핫플, 유행하는<br>트렌디한 곳 🔥</span>
+      </div>
+      <input type="range" id="crowdSlider" min="0" max="100" value="50" oninput="updateSliderLabel('crowdLabel',this.value,crowdLabels);updateProgress()">
+      <div class="slider-value" id="crowdLabel">적당히 트렌디하게</div>
+    </div>
+  </div>
+</div>
+
+<!-- 식사 & 취향 -->
+<div class="section">
+  <div class="section-title">식사 & 취향</div>
+
+  <!-- 시작 시간 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>데이트 시작 시간</strong>
+    </div>
+    <div class="chips" id="startTimeChips">
+      <button class="chip" onclick="selectChip('startTimeChips',this,'오전 10시')">오전 10시</button>
+      <button class="chip active" onclick="selectChip('startTimeChips',this,'오후 12시')">오후 12시</button>
+      <button class="chip" onclick="selectChip('startTimeChips',this,'오후 2시')">오후 2시</button>
+      <button class="chip" onclick="selectChip('startTimeChips',this,'오후 4시')">오후 4시</button>
+      <button class="chip" onclick="selectChip('startTimeChips',this,'오후 6시')">오후 6시</button>
+      <button class="chip" onclick="selectChip('startTimeChips',this,'오후 8시')">오후 8시</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-label">
+      <strong>식사 타이밍</strong>
+      오늘 데이트에서 밥의 비중은?
+    </div>
+    <div class="toggle-group" id="mealGroup">
+      <button class="toggle-btn" onclick="selectToggle('mealGroup',this,'밥이 메인')">
+        <span>🍽️</span>맛집 탐방이<br>메인 목적
+      </button>
+      <button class="toggle-btn active" onclick="selectToggle('mealGroup',this,'밥은 중간')">
+        <span>⚖️</span>코스 중간에<br>자연스럽게
+      </button>
+      <button class="toggle-btn" onclick="selectToggle('mealGroup',this,'밥은 서브')">
+        <span>🎭</span>활동이 메인,<br>밥은 가볍게
+      </button>
+    </div>
+  </div>
+
+  <!-- 취향 태그 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>오늘 분위기 태그</strong>
+      여러 개 선택 가능해요
+    </div>
+    <div class="tag-grid" id="tagGrid">
+      <button class="tag" onclick="toggleTag(this)">📸 인증샷 감성</button>
+      <button class="tag" onclick="toggleTag(this)">🎨 전시 / 갤러리</button>
+      <button class="tag" onclick="toggleTag(this)">🛍️ 쇼핑 / 팝업</button>
+      <button class="tag" onclick="toggleTag(this)">🌿 한강 / 공원</button>
+      <button class="tag" onclick="toggleTag(this)">🍸 바 / 야경</button>
+      <button class="tag" onclick="toggleTag(this)">🎮 액티비티</button>
+      <button class="tag" onclick="toggleTag(this)">🎬 영화 / 공연</button>
+      <button class="tag" onclick="toggleTag(this)">☕ 카페 투어</button>
+      <button class="tag" onclick="toggleTag(this)">🏛️ 로컬 골목</button>
+      <button class="tag" onclick="toggleTag(this)">🌙 야간 코스</button>
+    </div>
+  </div>
+
+  <!-- 예산 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>예산 (두 사람 합산)</strong>
+    </div>
+    <div class="chips" id="budgetChips">
+      <button class="chip" onclick="selectChip('budgetChips',this,'3만원 이하')">~3만원</button>
+      <button class="chip" onclick="selectChip('budgetChips',this,'5만원')">3~5만원</button>
+      <button class="chip active" onclick="selectChip('budgetChips',this,'10만원')">5~10만원</button>
+      <button class="chip" onclick="selectChip('budgetChips',this,'10만원 이상')">10만원+</button>
+    </div>
+  </div>
+
+  <!-- 자연어 추가 요청 -->
+  <div class="card">
+    <div class="card-label">
+      <strong>추가로 하고 싶은 말 (선택)</strong>
+      위 설정에 없는 내용을 자유롭게 써주세요
+    </div>
+    <textarea id="freeText"
+      style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);resize:none;outline:none;line-height:1.6;min-height:80px"
+      placeholder="예: 저번에 성수 갔다 왔으니까 거기 말고 다른 데로요. 여자친구가 요즘 좀 지쳐있어서 조용한 곳 위주로 부탁드려요 🙏"
+      oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+    ></textarea>
+  </div>
+</div>
+
+<!-- 결과 섹션 -->
+<div id="result-section">
+  <div style="padding:28px 28px 0">
+    <div class="section-title">AI 추천 코스</div>
+    <div id="result-header" style="margin-bottom:16px;font-family:'Noto Serif KR',serif;font-size:16px;font-weight:600;color:var(--text)"></div>
+
+    <!-- 트렌드 출처 배너 -->
+    <div id="trend-banner" style="display:none;background:rgba(176,125,79,0.07);border:1px solid rgba(176,125,79,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--muted);line-height:1.6"></div>
+
+    <!-- 플랜 탭 -->
+    <div class="plan-tabs" id="planTabs">
+      <button class="plan-tab active" onclick="switchPlan(0)">플랜 A</button>
+      <button class="plan-tab" onclick="switchPlan(1)">플랜 B</button>
+      <button class="plan-tab" onclick="switchPlan(2)">플랜 C</button>
+    </div>
+
+    <!-- 로딩 -->
+    <div id="loading-indicator" class="loading-dots" style="padding:24px 0">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+
+    <!-- 플랜 컨텐츠 -->
+    <div id="plan-0" class="plan-content"></div>
+    <div id="plan-1" class="plan-content" style="display:none"></div>
+    <div id="plan-2" class="plan-content" style="display:none"></div>
+  </div>
+</div>
+
+<!-- 장소 목록 섹션 -->
+<div id="map-section">
+  <div style="padding:0 28px">
+    <div class="section-title" style="padding:0 0 12px">📍 장소 — 탭하면 카카오맵으로</div>
+    <div class="map-places" id="map-places"></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+<div style="height:100px"></div>
+
+<!-- 설정 패널 -->
+<div id="settings-panel" onclick="closeSettingsOutside(event)">
+  <div class="settings-sheet">
+    <div class="settings-header">
+      <h2>API 키 설정</h2>
+      <button class="close-btn" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="key-row">
+      <div class="key-label">Gemini API Key <span>코스 생성에 사용</span></div>
+      <div class="key-input-row">
+        <input class="key-input" id="input-gemini" type="password" placeholder="AIza...">
+        <button class="key-save-btn" onclick="saveKey('gemini')">저장</button>
+      </div>
+      <div class="key-status" id="status-gemini"></div>
+      <a class="key-link" href="https://aistudio.google.com/app/apikey" target="_blank">↗ Google AI Studio에서 무료 발급</a>
+    </div>
+  </div>
+</div>
+
+<div class="cta-wrap">
+  <button class="cta-btn" onclick="generateCourse()">✨ 코스 추천받기</button>
+</div>
+
+<script>
+const energyLabels = [
+  [0,15,'☕ 카페에서 하루 종일'],
+  [16,35,'천천히 여유롭게'],
+  [36,65,'적당히 활동적으로'],
+  [66,85,'여러 곳 둘러보기'],
+  [86,100,'풀 액티브 투어 🔥']
+];
+const crowdLabels = [
+  [0,20,'완전 한적한 숨은 장소'],
+  [21,40,'조용한 편으로'],
+  [41,60,'적당히 트렌디하게'],
+  [61,80,'핫플 위주로'],
+  [81,100,'완전 최신 트렌드 🔥']
+];
+
+// ── 설정 패널 ──
+function openSettings() {
+  const panel = document.getElementById('settings-panel');
+  panel.classList.add('open');
+  const val = localStorage.getItem('gemini_api_key');
+  const input = document.getElementById('input-gemini');
+  const status = document.getElementById('status-gemini');
+  if(val) {
+    input.placeholder = '●●●● (저장됨)';
+    input.value = '';
+    status.textContent = '✓ 저장된 키가 있어요';
+    status.className = 'key-status ok';
+  } else {
+    status.textContent = '키가 없어요';
+    status.className = 'key-status empty';
+  }
+}
+function closeSettings() {
+  document.getElementById('settings-panel').classList.remove('open');
+  updateSettingsBtn();
+}
+function closeSettingsOutside(e) {
+  if(e.target === document.getElementById('settings-panel')) closeSettings();
+}
+function saveKey(name) {
+  const val = document.getElementById('input-'+name).value.trim();
+  if(!val) return;
+  localStorage.setItem(name+'_api_key', val);
+  document.getElementById('status-'+name).textContent = '✓ 저장됐어요!';
+  document.getElementById('status-'+name).className = 'key-status ok';
+  document.getElementById('input-'+name).value = '';
+  document.getElementById('input-'+name).placeholder = '●●●● (저장됨)';
+  updateSettingsBtn();
+}
+function updateSettingsBtn() {
+  const btn = document.getElementById('settingsBtn');
+  const hasGemini = !!localStorage.getItem('gemini_api_key');
+  btn.className = 'settings-trigger' + (hasGemini ? ' has-keys' : '');
+  btn.textContent = hasGemini ? '✓ API 키' : '⚙ API 키';
+}
+function getKey(name) {
+  return localStorage.getItem(name+'_api_key') || '';
+}
+
+// ── 슬라이더 / 칩 / 태그 ──
+function updateSliderLabel(id, val, labels) {
+  const v = parseInt(val);
+  const found = labels.find(l => v >= l[0] && v <= l[1]);
+  document.getElementById(id).textContent = found ? found[2] : '';
+  updateProgress();
+}
+function updateIndoor(n, val) {
+  const v = parseInt(val);
+  const el = document.getElementById('indoor'+n+'Val');
+  if(v < 20) el.textContent = '완전 실내 선호';
+  else if(v < 40) el.textContent = v+'% 실외 (실내 위주)';
+  else if(v < 60) el.textContent = '반반';
+  else if(v < 80) el.textContent = v+'% 실외 (실외 위주)';
+  else el.textContent = '완전 실외 선호';
+  const v1 = parseInt(document.querySelectorAll('input[type=range]')[2].value);
+  const v2 = parseInt(document.querySelectorAll('input[type=range]')[3].value);
+  const diff = Math.abs(v1 - v2);
+  const hint = document.getElementById('indoorHint');
+  if(diff > 50) hint.textContent = '⚡ 두 분 선호가 꽤 달라요 — AI가 타협안을 찾아드릴게요!';
+  else if(diff > 25) hint.textContent = '💬 약간의 차이가 있네요 — 절충된 코스를 추천해 드려요.';
+  else hint.textContent = '✓ 두 분 취향이 잘 맞아요!';
+}
+function selectChip(groupId, el) {
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  updateProgress();
+}
+function selectToggle(groupId, el) {
+  document.querySelectorAll('#'+groupId+' .toggle-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  updateProgress();
+}
+function toggleTag(el) { el.classList.toggle('active'); updateProgress(); }
+function updateProgress() {
+  let score = 0;
+  if(document.getElementById('mbti1').value.length===4) score+=20;
+  if(document.getElementById('mbti2').value.length===4) score+=20;
+  if(document.querySelector('#age1chips .chip.active')) score+=15;
+  if(document.querySelector('#age2chips .chip.active')) score+=15;
+  if(document.querySelectorAll('#tagGrid .tag.active').length>0) score+=15;
+  if(document.querySelector('#budgetChips .chip.active')) score+=15;
+  document.getElementById('progressFill').style.width = Math.min(score,100)+'%';
+}
+
+// ── 데이터 수집 ──
+function collectData() {
+  return {
+    mbti1: document.getElementById('mbti1').value || 'ISTP',
+    mbti2: document.getElementById('mbti2').value || 'INTP',
+    age1: document.querySelector('#age1chips .chip.active')?.textContent || '20대 후반',
+    age2: document.querySelector('#age2chips .chip.active')?.textContent || '20대 후반',
+    energy: document.getElementById('energySlider').value,
+    crowd: document.getElementById('crowdSlider').value,
+    indoor1: parseInt(document.querySelectorAll('input[type=range]')[2].value),
+    indoor2: parseInt(document.querySelectorAll('input[type=range]')[3].value),
+    meal: document.querySelector('#mealGroup .toggle-btn.active')?.textContent.trim().replace(/\s+/g,' ') || '코스 중간에',
+    tags: [...document.querySelectorAll('#tagGrid .tag.active')].map(t=>t.textContent.trim()),
+    budget: document.querySelector('#budgetChips .chip.active')?.textContent || '5~10만원',
+    startTime: document.querySelector('#startTimeChips .chip.active')?.textContent || '오후 12시',
+    freeText: document.getElementById('freeText')?.value.trim() || ''
+  };
+}
+
+// ── 플랜 탭 전환 ──
+let plansData = [];
+function switchPlan(idx) {
+  document.querySelectorAll('.plan-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.plan-content').forEach((c,i) => c.style.display = i===idx ? 'block' : 'none');
+  // 장소 목록 업데이트
+  if(plansData[idx]) renderPlaceCards(plansData[idx].places);
+}
+
+function renderPlaceCards(places) {
+  const mapSection = document.getElementById('map-section');
+  const listEl = document.getElementById('map-places');
+  if(!places || !places.length) { mapSection.style.display='none'; return; }
+  mapSection.style.display = 'block';
+  listEl.innerHTML = places.map((p) => {
+    const kakaoUrl = `https://map.kakao.com/link/search/${encodeURIComponent(p.name)}`;
+    const imgUrl = `https://source.unsplash.com/400x200/?${encodeURIComponent(p.name+' seoul korea cafe')}`;
+    return `
+      <div class="place-card">
+        <img class="place-photo" src="${imgUrl}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="place-photo-placeholder" style="display:none">📍</div>
+        <div class="place-body">
+          <div class="place-row">
+            <div class="place-name">${p.name}</div>
+            ${p.time ? `<div class="place-time-badge">${p.time}</div>` : ''}
+          </div>
+          ${p.reason ? `<div class="place-reason">${p.reason}</div>` : ''}
+          <a class="place-kakao-btn" href="${kakaoUrl}" target="_blank">🗺 카카오맵에서 보기</a>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderPlanContent(plan, idx) {
+  const el = document.getElementById('plan-'+idx);
+  el.innerHTML = `
+    <div class="budget-summary">
+      <strong>${plan.theme || '추천 코스'}</strong><br>
+      ${plan.summary || ''}
+    </div>
+    ${plan.places ? plan.places.map((p,i) => `
+      <div style="display:flex;align-items:center;gap:8px;margin:16px 0 8px">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+        <div style="font-size:13px;font-weight:500">${p.name}</div>
+        ${p.time ? `<div class="place-time-badge">${p.time}</div>` : ''}
+      </div>
+      ${p.reason ? `<div style="font-size:12px;color:var(--muted);padding-left:28px;line-height:1.5">${p.reason}</div>` : ''}
+    `).join('') : ''}
+    ${plan.budget_detail ? `<div class="budget-summary" style="margin-top:12px">💰 ${plan.budget_detail}</div>` : ''}
+  `;
+}
+
+// ── 코스 생성 ──
+async function generateCourse() {
+  // Vercel 배포 환경이면 서버리스 함수 사용, 로컬이면 직접 호출
+  const isVercel = window.location.hostname !== 'localhost' && !window.location.protocol.startsWith('file');
+  const geminiKey = isVercel ? null : getKey('gemini');
+  if(!isVercel && !geminiKey) { openSettings(); return; }
+
+  const d = collectData();
+  const rs = document.getElementById('result-section');
+  rs.style.display = 'block';
+  document.getElementById('loading-indicator').style.display = 'flex';
+  document.getElementById('map-section').style.display = 'none';
+  document.querySelectorAll('.plan-content').forEach(c => c.innerHTML = '');
+  plansData = [];
+  rs.scrollIntoView({behavior:'smooth', block:'start'});
+
+  // ── 1단계: 네이버 블로그 검색으로 실제 트렌드 수집 ──
+  let naverContext = '';
+  try {
+    const tags = d.tags.join(' ') || '서울 데이트';
+    const queries = [
+      `서울 핫플 카페 ${new Date().getFullYear()}`,
+      `${tags} 서울 추천`,
+    ];
+    const results = await Promise.all(queries.map(q =>
+      fetch(`/api/naver-search?query=${encodeURIComponent(q)}&type=blog`)
+        .then(r => r.json()).catch(() => null)
+    ));
+    const items = results.flatMap(r => r?.items || []).slice(0, 6);
+    if(items.length > 0) {
+      naverContext = '\n\n[네이버 블로그 최신 검색 결과 — 이 데이터를 반드시 참고해서 실제 장소를 추천하세요]\n' +
+        items.map(item => {
+          const title = item.title.replace(/<[^>]+>/g, '');
+          const desc = item.description.replace(/<[^>]+>/g, '').slice(0, 100);
+          return `- ${title}: ${desc}`;
+        }).join('\n');
+    }
+  } catch(e) {
+    console.log('네이버 검색 실패 (무시):', e.message);
+  }
+
+  const indoor1Desc = d.indoor1 < 40 ? '실내 선호' : d.indoor1 < 60 ? '반반' : '실외 선호';
+  const indoor2Desc = d.indoor2 < 40 ? '실내 선호' : d.indoor2 < 60 ? '반반' : '실외 선호';
+
+  const prompt = `당신은 서울 데이트 코스 전문 플래너입니다.${naverContext}
+
+[커플 정보]
+- MBTI: ${d.mbti1} + ${d.mbti2} / 연령대: ${d.age1}, ${d.age2}
+- 실내/실외: ${indoor1Desc} / ${indoor2Desc}
+- 에너지: ${d.energy < 35 ? '여유롭게' : d.energy < 65 ? '적당히 활동적' : '활발하게'} / 인파: ${d.crowd < 35 ? '한적한 곳' : d.crowd < 65 ? '적당히 트렌디' : '핫플 위주'}
+- 식사: ${d.meal} / 태그: ${d.tags.join(', ') || '없음'}
+- 예산: ${d.budget} / 시작시간: ${d.startTime}
+${d.freeText ? `\n[추가 요청사항]\n${d.freeText}` : ''}
+
+[장소 선정 규칙]
+- 위 네이버 검색 결과에 언급된 실제 장소 우선 사용
+- 반드시 구체적인 가게/장소명 (예: "성수 카페 어니언", "망원 국수나무" 등)
+- 동네 이름만 쓰지 말 것
+- 플랜마다 다른 동네/컨셉으로
+- ${new Date().getFullYear()}년 현재 영업 중인 곳
+
+JSON으로만 응답. 다른 텍스트 금지:
+
+{
+  "trend_sources": "네이버 검색 결과에서 찾은 요즘 서울 트렌드. 출처 블로그명 포함",
+  "plans": [
+    {
+      "plan": "A",
+      "theme": "코스 테마명",
+      "summary": "이 커플에게 맞는 이유 1-2문장",
+      "places": [
+        {"name": "실제 장소명", "time": "${d.startTime}", "reason": "이유 한 줄"},
+        {"name": "실제 장소명", "time": "시간", "reason": "이유"},
+        {"name": "실제 장소명", "time": "시간", "reason": "이유"},
+        {"name": "실제 장소명", "time": "시간", "reason": "이유"}
+      ],
+      "budget_detail": "예상 예산 배분"
+    },
+    {"plan": "B", "theme": "...", "summary": "...", "places": [...], "budget_detail": "..."},
+    {"plan": "C", "theme": "...", "summary": "...", "places": [...], "budget_detail": "..."}
+  ]
+}`;
+
+  // ── 2단계: Gemini로 코스 생성 ──
+  try {
+    let data;
+    if(isVercel) {
+      // 서버리스 함수 경유 (API 키 숨김)
+      const res = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      data = await res.json();
+      if(data.error) throw new Error(data.error);
+    } else {
+      // 로컬 직접 호출 (개발용)
+      const MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
+      const wait = ms => new Promise(r => setTimeout(r, ms));
+      async function tryFetch(idx) {
+        if(idx >= MODELS.length) throw new Error('모든 모델 사용 불가. 잠시 후 다시 시도해 주세요.');
+        if(idx > 0) await wait(1500);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS[idx]}:generateContent?key=${geminiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tools:[{google_search:{}}], contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.8,maxOutputTokens:3500} })
+        });
+        if([404,429,503].includes(res.status)) return tryFetch(idx+1);
+        const d = await res.json();
+        if(d.error) {
+          const m = d.error.message||'';
+          if(m.includes('high demand')||m.includes('quota')||m.includes('not found')) return tryFetch(idx+1);
+          throw new Error(m);
+        }
+        return d;
+      }
+      data = await tryFetch(0);
+    }
+
+    document.getElementById('loading-indicator').style.display = 'none';
+
+    if(data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      let raw = data.candidates[0].content.parts[0].text;
+      raw = raw.replace(/```json|```/g, '').trim();
+      const jsonStart = raw.indexOf('{');
+      const jsonEnd = raw.lastIndexOf('}');
+      if(jsonStart === -1) throw new Error('결과 파싱 실패');
+      const parsed = JSON.parse(raw.slice(jsonStart, jsonEnd+1));
+
+      document.getElementById('result-header').textContent = `✨ ${d.mbti1} + ${d.mbti2} — ${d.startTime} 출발`;
+
+      if(parsed.trend_sources) {
+        const banner = document.getElementById('trend-banner');
+        banner.style.display = 'block';
+        banner.innerHTML = `🔥 <strong>트렌드 출처</strong> — ${parsed.trend_sources}`;
+      }
+
+      plansData = parsed.plans || [];
+      plansData.forEach((plan, idx) => renderPlanContent(plan, idx));
+      switchPlan(0);
+    } else {
+      throw new Error('결과를 불러오지 못했어요.');
+    }
+  } catch(e) {
+    document.getElementById('loading-indicator').style.display = 'none';
+    document.getElementById('plan-0').innerHTML = `<div style="color:var(--muted);font-size:13px;padding:16px 0">❌ ${e.message}</div>`;
+  }
+}
+
+  const prompt = `당신은 서울 데이트 코스 전문 플래너입니다.
+
+**[1단계] 먼저 아래 내용을 웹에서 검색하세요:**
+- "${new Date().toLocaleDateString('ko-KR', {month:'long',day:'numeric'})} 서울 핫플레이스 카페 팝업스토어 2025"
+- "서울 요즘 뜨는 동네 데이트 코스 ${new Date().getFullYear()}"
+- "${d.tags.join(' ')||'서울 데이트'} 서울 최신 장소"
+
+**[2단계] 검색 결과를 바탕으로** 아래 커플에게 맞는 실제 존재하는 구체적인 장소명(카페, 식당, 공원 등 정확한 이름)으로 플랜 3가지를 만드세요.
+
+[커플 정보]
+- MBTI: ${d.mbti1} + ${d.mbti2} / 연령대: ${d.age1}, ${d.age2}
+- 실내/실외: ${d.indoor1 < 40 ? '실내 선호' : d.indoor1 < 60 ? '반반' : '실외 선호'} / ${d.indoor2 < 40 ? '실내 선호' : d.indoor2 < 60 ? '반반' : '실외 선호'}
+- 에너지: ${d.energy < 35 ? '여유롭게' : d.energy < 65 ? '적당히 활동적' : '활발하게'} / 인파: ${d.crowd < 35 ? '한적한 곳' : d.crowd < 65 ? '적당히 트렌디' : '핫플 위주'}
+- 식사: ${d.meal} / 태그: ${d.tags.join(', ') || '없음'}
+- 예산: ${d.budget} / 시작시간: ${d.startTime}
+
+[장소 선정 규칙]
+- 반드시 실제로 존재하는 구체적인 장소명 (예: "성수동 카페 어니언", "망원동 망원시장" 등)
+- 2025년 현재 영업 중인 곳
+- 요즘 SNS(인스타, 틱톡)에서 실제 언급되는 곳 우선
+- 동네 이름만 쓰지 말고 반드시 구체적인 가게/장소명 포함
+- 플랜마다 다른 동네/컨셉으로
+
+**[3단계] 검색 결과와 커플 정보를 종합해서 아래 JSON으로만 응답하세요. JSON 외 다른 텍스트 금지:**
+
+{
+  "trend_sources": "검색에서 찾은 요즘 서울 트렌드 2-3줄. 어느 SNS/미디어에서 유행하는지 출처 포함",
+  "plans": [
+    {
+      "plan": "A",
+      "theme": "코스 테마명",
+      "summary": "이 커플에게 맞는 이유 1-2문장",
+      "places": [
+        {"name": "실제 장소명 (예: 성수동 카페 어니언)", "time": "${d.startTime}", "reason": "이 커플에게 맞는 이유 한 줄"},
+        {"name": "실제 장소명", "time": "시간", "reason": "이유"},
+        {"name": "실제 장소명", "time": "시간", "reason": "이유"},
+        {"name": "실제 장소명", "time": "시간", "reason": "이유"}
+      ],
+      "budget_detail": "예상 예산 배분"
+    },
+    {"plan": "B", "theme": "...", "summary": "...", "places": [...], "budget_detail": "..."},
+    {"plan": "C", "theme": "...", "summary": "...", "places": [...], "budget_detail": "..."}
+  ]
+}`;
+
+  const MODELS = [
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-flash',
+  ];
+
+  const loadingEl = document.getElementById('loading-indicator');
+
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  async function tryFetch(modelIdx) {
+    if(modelIdx >= MODELS.length) throw new Error('모든 모델이 현재 사용 불가해요. 잠시 후 다시 시도해 주세요.');
+    const model = MODELS[modelIdx];
+
+    // 두 번째 모델부터는 1.5초 대기
+    if(modelIdx > 0) await wait(1500);
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tools: [{ google_search: {} }],
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.8, maxOutputTokens: 3500 }
+      })
+    });
+
+    // 404 / 429 / 503 → 다음 모델로
+    if(res.status === 404 || res.status === 429 || res.status === 503) {
+      console.warn(`${model} ${res.status} 오류, 다음 모델로 전환...`);
+      return tryFetch(modelIdx + 1);
+    }
+
+    const data = await res.json();
+
+    // 에러 메시지에서도 감지
+    if(data.error) {
+      const msg = data.error.message || '';
+      const isRetryable = msg.includes('high demand') || msg.includes('overloaded')
+        || msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED')
+        || msg.includes('not found') || msg.includes('404');
+      if(isRetryable) {
+        console.warn(`${model} 에러: ${msg}, 다음 모델로 전환...`);
+        return tryFetch(modelIdx + 1);
+      }
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  try {
+    const data = await tryFetch(0);
+    document.getElementById('loading-indicator').style.display = 'none';
+
+    if(data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      let raw = data.candidates[0].content.parts[0].text;
+      raw = raw.replace(/```json|```/g, '').trim();
+      const jsonStart = raw.indexOf('{');
+      const jsonEnd = raw.lastIndexOf('}');
+      if(jsonStart === -1) throw new Error('JSON 없음');
+      const parsed = JSON.parse(raw.slice(jsonStart, jsonEnd+1));
+
+      document.getElementById('result-header').textContent = `✨ ${d.mbti1} + ${d.mbti2} — ${d.startTime} 출발`;
+
+      if(parsed.trend_sources) {
+        const banner = document.getElementById('trend-banner');
+        banner.style.display = 'block';
+        banner.innerHTML = `🔥 <strong>요즘 트렌드</strong> — ${parsed.trend_sources}`;
+      }
+
+      plansData = parsed.plans || [];
+      plansData.forEach((plan, idx) => renderPlanContent(plan, idx));
+      switchPlan(0);
+
+    } else {
+      document.getElementById('plan-0').innerHTML = `<div style="color:var(--muted);font-size:13px;padding:16px 0">⚠️ 결과를 불러오지 못했어요. 다시 시도해 주세요.</div>`;
+    }
+  } catch(e) {
+    document.getElementById('loading-indicator').style.display = 'none';
+    document.getElementById('plan-0').innerHTML = `<div style="color:var(--muted);font-size:13px;padding:16px 0">❌ ${e.message}</div>`;
+  }
+}
+
+// ── 초기화 ──
+updateProgress();
+updateSettingsBtn();
+updateIndoor(1, 50);
+updateIndoor(2, 50);
+updateSliderLabel('energyLabel', 50, energyLabels);
+updateSliderLabel('crowdLabel', 50, crowdLabels);
+</script>
+</body>
+</html>
